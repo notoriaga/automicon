@@ -1,0 +1,30 @@
+{
+  "name": "image-generation",
+  "version": "0.0.0",
+  "description": "",
+  "author": "steve <steven@stdlib.com>",
+  "main": "functions/__main__.js",
+  "dependencies": {
+    "identicon.js": "^2.3.1",
+    "jimp": "^0.2.28",
+    "node-png": "^0.4.3",
+    "pngjs": "^3.3.0",
+    "pnglib-es6": "^1.0.1"
+  },
+  "private": true,
+  "stdlib": {
+    "build": "faaslang",
+    "name": "steve/image-generation",
+    "timeout": 10000,
+    "publish": true,
+    "personalize": {
+      "keys": [],
+      "user": []
+    }
+  },
+  "devDependencies": {
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-import": "^2.7.0"
+  }
+}
