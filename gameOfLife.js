@@ -1,5 +1,5 @@
-const dead = '#FFFFFF';
-const alive = '#000000';
+const dead = '255';
+const alive = '0';
 
 const conway = [
   [2, 3], //survive
