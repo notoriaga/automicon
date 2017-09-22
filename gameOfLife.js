@@ -22,7 +22,7 @@ const rules = serviettes;
 
 function run(size, iterations) {
 
-  let board = binarygrid(16);
+  let board = binarygrid(size);
   
   while (iterations > 0) {
     board = evolve(board);
