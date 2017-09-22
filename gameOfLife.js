@@ -5,7 +5,18 @@ const conway = [
   [2, 3], //survive
   [3] //born
 ];
-const serviettes = [[], [2, 3, 4]];
+const serviettes = [
+  [], 
+  [2, 3, 4]
+];
+const maze = [
+  [1,2,3,4,5],
+  [3]
+];
+const walls = [
+  [2,3,4],
+  [4,5,6,7,8]
+];
 
 const neighbors = [
   [-1, -1],
@@ -18,7 +29,7 @@ const neighbors = [
   [1, 1]
 ];
 
-const rules = serviettes;
+const rules = maze;
 
 function run(size, iterations) {
 
@@ -92,7 +103,7 @@ function binarygrid(size) {
   for (let i = 0; i < size; i++) {
     let row = [];
     for (let j = 0; j < size; j++) {
-      if (Math.random() > 0.9) {
+      if (Math.random() > 0.5) {
         row.push(alive);
       } else {
         row.push(dead);

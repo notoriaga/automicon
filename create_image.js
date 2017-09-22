@@ -5,8 +5,9 @@ const PNG = require('pngjs').PNG;
 
 const gameOfLife = require('./gameOfLife');
 
-let NUM_BLOCKS = 8;
-let BLOCK_SIZE = 16; // pixels
+const NUM_BLOCKS = 8;
+const BLOCK_SIZE = 16; // pixels
+const IMG_SIZE = 256; 
 
 const md5 = (str) => {
   
@@ -16,10 +17,10 @@ const md5 = (str) => {
 };
 
 const pngFromArray = (arr) => {
-
+  console.log(arr)
   let png = new PNG({
-    width: 128,
-    height: 128
+    width: IMG_SIZE / 2,
+    height: IMG_SIZE / 2 
   });
 
   let currentColorY = -1;
@@ -56,14 +57,14 @@ const pngFromArray = (arr) => {
 
 };
 
-const generateImage = (png, size = 256) => {
+const generateImage = (png, size = IMG_SIZE) => {
 
   png.pack().pipe(fs.createWriteStream('temp.png'));
   
   Jimp.read('temp.png', function (err, quarter) {
     
-    let half = new Jimp(128, 256);
-    let whole = new Jimp(256, 256);
+    let half = new Jimp(size / 2, size);
+    let whole = new Jimp(size, size);
   
     half.blit(quarter, 0 ,0)
         .blit(quarter.flip(false, true), 0, 128)
@@ -78,4 +79,4 @@ const generateImage = (png, size = 256) => {
 
 };
 
-generateImage(pngFromArray(gameOfLife.run(NUM_BLOCKS, 100)));
+generateImage(pngFromArray(gameOfLife.run(NUM_BLOCKS, 10)));
