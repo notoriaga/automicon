@@ -1,5 +1,7 @@
-const dead = '255';
-const alive = '0';
+const crypto = require('crypto');
+
+const DEAD = '255';
+const ALIVE = '0';
 
 const conway = [
   [2, 3], //survive
@@ -17,6 +19,20 @@ const walls = [
   [2,3,4],
   [4,5,6,7,8]
 ];
+const walledCity = [
+  [2,3,4,5],
+  [4,5,6,7,8]
+];	
+const lifeWithoutDeath = [
+  [0,1,2,3,4,5,6,7,8],
+  [3]
+];
+const dayAndNight = [
+  [3,4,6,7,8],
+  [3,6,7,8]
+];
+
+
 
 const neighbors = [
   [-1, -1],
@@ -29,20 +45,47 @@ const neighbors = [
   [1, 1]
 ];
 
-const rules = maze;
+const rules = walls;
 
-function run(size, iterations) {
-
-  let board = binarygrid(size);
+const sha256 = (str) => {
   
-  while (iterations > 0) {
-    board = evolve(board);
-    iterations--;
-  }
-  
-  return board;
+  return crypto.createHash('md5').update(str).digest('hex');
 
+};
+
+
+function hex2bin(hex)
+{
+    var bytes = [], str;
+
+    for(var i=0; i< hex.length-1; i+=2)
+        bytes.push(parseInt(hex.substr(i, 2), 16));
+
+    return String.fromCharCode.apply(String, bytes);    
 }
+
+const hashToAD = (hash, size) => {
+  
+  let possibleChars = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  
+  let seed = hash.slice(0, size ** 2).split('');
+
+  return seed.map((char) => {
+
+    return possibleChars.indexOf(char) <= 7 ? ALIVE : DEAD;
+
+  })
+
+};
+
+const toMatrix = (arr, width) =>
+  arr.reduce(
+    (rows, key, index) =>
+      (index % width == 0
+        ? rows.push([key])
+        : rows[rows.length - 1].push(key)) && rows,
+    []
+  );
 
 function evolve(board) {
 
@@ -63,17 +106,17 @@ function evolveCell(board, row, col) {
 
 function applyRules(cell, neighborCount, rules) {
   
-  if (cell === alive && rules[0].indexOf(neighborCount) > -1) {
+  if (cell === ALIVE && rules[0].indexOf(neighborCount) > -1) {
     // survive
-    return alive;
+    return ALIVE;
   }
 
-  if (cell === dead && rules[1].indexOf(neighborCount) > -1) {
+  if (cell === DEAD && rules[1].indexOf(neighborCount) > -1) {
     // born
-    return alive;
+    return ALIVE;
   }
 
-  return dead;
+  return DEAD;
 
 }
 
@@ -85,7 +128,7 @@ function getCellNeighbors(board, row, col) {
     
     if (
       board[row + neighbor[0]] &&
-      board[row + neighbor[0]][col + neighbor[1]] === alive
+      board[row + neighbor[0]][col + neighbor[1]] === ALIVE
     ) {
       count++;
     }
@@ -96,24 +139,36 @@ function getCellNeighbors(board, row, col) {
 
 }
 
-function binarygrid(size) {
+function run(size, iterations, seed) {
 
-  let grid = [];
-  
-  for (let i = 0; i < size; i++) {
-    let row = [];
-    for (let j = 0; j < size; j++) {
-      if (Math.random() > 0.5) {
-        row.push(alive);
-      } else {
-        row.push(dead);
+    let bits = ((size) => {
+      let bits = [];
+      for (let i  = 0; i < size ** 2; i++) {
+        bits.push(
+          Math.round(Math.random()) === 0 ? DEAD : ALIVE
+        );
       }
+      return bits
+    })(size)
+    
+    //let board = toMatrix(hashToAD(sha256(seed), size), size);
+    let board = toMatrix(bits, size)
+    
+    while (iterations > 0) {
+      board = evolve(board);
+      iterations--;
     }
-    grid.push(row);
+    
+    if (allEqual(board)) {
+      console.log('dud')
+      board = run(size, iterations, seed);
+    }
+    
+    return board;
+  
   }
 
-  return grid;
-
-}
+const allEqual = arr => arr.every( v => v == arr[0] );
+  
 
 module.exports.run = run;
