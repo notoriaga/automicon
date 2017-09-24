@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
-const DEAD = '255';
-const ALIVE = '0';
+const DEAD = {red: 255, green: 255, blue: 255};
+const ALIVE = pastel_colour(Math.random().toString(36).substring(10));
 
 const conway = [
   [2, 3], //survive
@@ -45,7 +45,28 @@ const neighbors = [
   [1, 1]
 ];
 
-const rules = walls;
+const rules = dayAndNight;
+
+
+function pastel_colour(input_str) {
+  
+      //TODO: adjust base colour values below based on theme
+      let baseRed = 128;
+      let baseGreen = 128;
+      let baseBlue = 128;
+  
+      //lazy seeded random hack to get values from 0 - 256
+      //for seed just take bitwise XOR of first two chars
+      let seed = input_str.charCodeAt(0) ^ input_str.charCodeAt(1);
+      let rand_1 = Math.abs((Math.sin(seed++) * 10000)) % 256;
+      let rand_2 = Math.abs((Math.sin(seed++) * 10000)) % 256;
+      let rand_3 = Math.abs((Math.sin(seed++) * 10000)) % 256;
+  
+      return { red: Math.round((rand_1 + baseRed) / 2), 
+               green: Math.round((rand_2 + baseGreen) / 2), 
+               blue:  Math.round((rand_3 + baseBlue) / 2)};
+}
+  
 
 const sha256 = (str) => {
   
@@ -143,7 +164,7 @@ function run(size, iterations, seed) {
 
     let bits = ((size) => {
       let bits = [];
-      for (let i  = 0; i < size ** 2; i++) {
+      for (let i  = 0; i < (size ** 2) * 2; i++) {
         bits.push(
           Math.round(Math.random()) === 0 ? DEAD : ALIVE
         );
@@ -153,22 +174,16 @@ function run(size, iterations, seed) {
     
     //let board = toMatrix(hashToAD(sha256(seed), size), size);
     let board = toMatrix(bits, size)
+    console.log(board.length,board[0].length, board[board.length - 1].length)
     
     while (iterations > 0) {
       board = evolve(board);
       iterations--;
     }
     
-    if (allEqual(board)) {
-      console.log('dud')
-      board = run(size, iterations, seed);
-    }
-    
     return board;
   
   }
-
-const allEqual = arr => arr.every( v => v == arr[0] );
   
 
 module.exports.run = run;
