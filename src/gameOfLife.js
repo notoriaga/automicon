@@ -144,13 +144,11 @@ const hash = (seed, length) => {
                .split('');
 };
 
-function run(size, iterations, seed) {
+function run(height, width, iterations, seed) {
 
-    //seed = toCells(randomString((size ** 2) * 2));
-    console.log(size ** 2 * 2, ' cell');
+    let numCells = height * width;
 
-//    let board = toMatrix(seed, size)
-    let board = toMatrix(toCells(hash(seed)), size)
+    let board = toMatrix(toCells(hash(seed, numCells)), width)
 
     while (iterations > 0) {
       board = evolve(board);
@@ -161,8 +159,7 @@ function run(size, iterations, seed) {
       return acc + row.filter(cell => cell === ALIVE).length;
     }, 0);
 
-    console.log(numAlive, ' alive')
-    if (numAlive < 5 ) {
+    if (numAlive < 8 ) {
       return run(size, iterations, seed);
     }
 

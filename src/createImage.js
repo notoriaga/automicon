@@ -11,7 +11,6 @@ const HALF_IMG_SIZE = FINAL_IMG_SIZE / 2;
 const CELL_SIZE = 2 ** 5 ; // length of one side
 const NUM_CELLS = HALF_IMG_SIZE / CELL_SIZE;
 
-
  module.exports = (seed = 'seed', options) => {
 
   let game = gameOfLife.run(NUM_CELLS, ITERATIONS, seed);
@@ -59,7 +58,6 @@ const pngFromMatrix = (arr) => {
           png.data[idx2+2] = arr[currentColorY][currentColorX].blue;
           png.data[idx2+3] = 255;
 
-
       }
 
     }
@@ -67,3 +65,12 @@ const pngFromMatrix = (arr) => {
     return png;
 
 };
+
+let seed = 'dfalkjs'
+let width = 4;
+let height = 8;
+
+let game = gameOfLife.run(height, width, ITERATIONS, seed);
+let png = pngFromMatrix(game);
+
+png.pack().pipe(fs.createWriteStream("test.png"));

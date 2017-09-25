@@ -13,7 +13,7 @@ module.exports = (seed, options, context, callback) => {
 
   png.pack().pipe(fs.createWriteStream("test.png"));
 
-  return callback(null, png);
+  return callback(null);
 
 };
 
