@@ -1,48 +1,38 @@
-const Jimp = require("jimp");
+const fs = require('fs');
+const createImage = require('../src/createImage');
 
 /**
+* @param {string} seed
+* @param {object} options
 * @returns {any}
 */
-module.exports = (context, callback) => {
-  return createImage()
-  return callback(null, 'hello');
+module.exports = (seed, options, context, callback) => {
+
+  let strongOptions = validateOptions(options);
+  let png = createImage(seed, strongOptions);
+
+  png.pack().pipe(fs.createWriteStream("test.png"));
+
+  return callback(null, png);
+
 };
 
 
-function createImage(callback) {
-  Jimp.read("test.jpg", function (err, test) {
-        if (err) throw err;
-        test.resize(256, 256)
-             .quality(50)
-             .write(__dirname + "./new.jpg");
-  });
-};
+const validateOptions = (options) => {
 
+  const isPowerOfTwo = (param) => {
 
-function onBuffer(err, buffer) {
-    if (err) throw err;
-    console.log(buffer);
-};
+    return typeof n === 'number' ? n && (n & (n - 1)) === 0
+                                 : false
 
+  }
 
-function donutJGD() {
-    //Pallet  RRGGBBAA
-    var _ = 0xFFFFFF00,
-        i = 0xFF880088,
-        X = 0xFF8800FF;
-    return {
-        width: 10, height: 10,
-        data: [
-            _,_,_,_,_,_,_,_,_,_,
-            _,_,_,i,X,X,i,_,_,_,
-            _,_,X,X,X,X,X,X,_,_,
-            _,i,X,X,i,i,X,X,i,_,
-            _,X,X,i,_,_,i,X,X,_,
-            _,X,X,i,_,_,i,X,X,_,
-            _,i,X,X,i,i,X,X,i,_,
-            _,_,X,X,X,X,X,X,_,_,
-            _,_,_,i,X,X,i,_,_,_,
-            _,_,_,_,_,_,_,_,_,_
-        ]
-    };
+  return {
+
+    width: options.width || 256,
+    height: options.height || 256,
+    cellSize: isPowerOfTwo(options.cellSize) ? options.cellSize
+                                             : 32
+  };
+
 };
