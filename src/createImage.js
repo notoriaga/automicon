@@ -13,17 +13,30 @@ const NUM_CELLS = HALF_IMG_SIZE / CELL_SIZE;
 
  module.exports = (seed = 'seed', options) => {
 
-  let game = gameOfLife.run(NUM_CELLS, ITERATIONS, seed);
+  let width = 4;
+  let height = 8;
+  let iterations = 5;
+  let cellSize = 256 / height;
 
-  return pngFromMatrix(game);
+
+  function randomString(length) {
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+  }
+
+  seed = randomString(5)
+  let game = gameOfLife.run(height, width, iterations, seed);
+
+  let png = pngFromGOLMatric(game, width, cellSize);
+
+  return png;
 
 };
 
-const pngFromMatrix = (arr) => {
+const pngFromGOLMatric = (matrix, width, cellSize) => {
 
   let png = new PNG({
-      width: FINAL_IMG_SIZE - 1,
-      height: FINAL_IMG_SIZE - 1
+      height: FINAL_IMG_SIZE - 1,
+      width: FINAL_IMG_SIZE - 1
     });
 
     let currentColorY = -1;
@@ -31,46 +44,40 @@ const pngFromMatrix = (arr) => {
 
     for (let y = 0; y < png.height; y++) {
 
-      if (y % CELL_SIZE === 0) {
+      if (y % cellSize === 0) {
         currentColorY++;
       }
 
       for (let x = 0; x < png.width / 2; x++) {
 
-          if (x % CELL_SIZE === 0) {
+          if (x % cellSize === 0) {
             currentColorX++;
           }
 
-          if (currentColorX === NUM_CELLS) {
+          if (currentColorX === width) {
             currentColorX = 0;
           }
 
-          let idx1 = (png.width * y + x) << 2;
-          let idx2 = (png.width * y + (png.width - x)) << 2;
+          let left = (png.width * y + x) << 2;
+          let right = (png.width * y + (png.width - x)) << 2;
 
-          png.data[idx1] = arr[currentColorY][currentColorX].red;
-          png.data[idx1+1] = arr[currentColorY][currentColorX].green;
-          png.data[idx1+2] = arr[currentColorY][currentColorX].blue;
-          png.data[idx1+3] = 255;
+          png.data[left] = matrix[currentColorY][currentColorX].red;
+          png.data[left+1] = matrix[currentColorY][currentColorX].green;
+          png.data[left+2] = matrix[currentColorY][currentColorX].blue;
+          png.data[left+3] = 255;
 
-          png.data[idx2] = arr[currentColorY][currentColorX].red;
-          png.data[idx2+1] = arr[currentColorY][currentColorX].green;
-          png.data[idx2+2] = arr[currentColorY][currentColorX].blue;
-          png.data[idx2+3] = 255;
+
+          png.data[right] = matrix[currentColorY][currentColorX].red;
+          png.data[right+1] = matrix[currentColorY][currentColorX].green;
+          png.data[right+2] = matrix[currentColorY][currentColorX].blue;
+          png.data[right+3] = 255;
 
       }
 
     }
 
-    return png;
+    let buffer = PNG.sync.write(png);
+
+    return buffer;
 
 };
-
-let seed = 'dfalkjs'
-let width = 4;
-let height = 8;
-
-let game = gameOfLife.run(height, width, ITERATIONS, seed);
-let png = pngFromMatrix(game);
-
-png.pack().pipe(fs.createWriteStream("test.png"));

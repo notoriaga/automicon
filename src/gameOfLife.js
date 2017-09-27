@@ -1,47 +1,47 @@
 const crypto = require('crypto');
 
-const generateColor = require('./generateColor');
+const ALIVE = require('./generateColor')();
 
-const DEAD = {red: 223, green: 223, blue: 223};
-const ALIVE = generateColor();
+const DEAD = {
+  red: 223,
+  green: 223,
+  blue: 223
+};
 
-const conway = [
-  [2, 3], //survive
-  [3] //born
-];
-const serviettes = [
-  [],
-  [2, 3, 4]
-];
-const maze = [
-  [1,2,3,4,5],
-  [3]
-];
-const maze2 = [
-  [1,2,3,4],
-  [3]
-];
-const walls = [
-  [2,3,4],
-  [4,5,6,7,8]
-];
-const walledCity = [
-  [2,3,4,5],
-  [4,5,6,7,8]
-];
-const lifeWithoutDeath = [
-  [0,1,2,3,4,5,6,7,8],
-  [3]
-];
-const dayAndNight = [
-  [3,4,6,7,8],
-  [3,6,7,8]
-];
-const diamoeba = [
-  [5,6,7,8],
-  [3,5,6,7,8]
-];
-
+const rulesMap = {
+  'conway': [
+    [2, 3], //survive
+    [3] //born
+  ],
+  'serviettes': [
+    [],
+    [2, 3, 4]
+  ],
+  'maze': [
+    [1,2,3,4,5],
+    [3]
+  ],
+  'walls': [
+    [2,3,4],
+    [4,5,6,7,8]
+  ],
+  'walledCity': [
+    [2,3,4,5],
+    [4,5,6,7,8]
+  ],
+  'lifeWithoutDeath': [
+    [0,1,2,3,4,5,6,7,8],
+    [3]
+  ],
+  'dayAndNight': [
+    [3,4,6,7,8],
+    [3,6,7,8]
+  ],
+  'diamoeba': [
+    [5,6,7,8],
+    [3,5,6,7,8]
+  ]
+};
 
 const neighbors = [
   [-1, -1],
@@ -54,7 +54,7 @@ const neighbors = [
   [1, 1]
 ];
 
-const rules = walls;
+const rules = rulesMap['conway'];
 
 const toCells = (hash) => {
 
@@ -160,10 +160,15 @@ function run(height, width, iterations, seed) {
     }, 0);
 
     if (numAlive < 8 ) {
-      return run(size, iterations, seed);
+      return run(height, width, iterations, seed);
     }
 
+    let fullBoard = board.map((row) => {
+      return row.concat(row.slice().reverse());
+    });
+
     return board;
+    // return fullBoard;
 
   }
 

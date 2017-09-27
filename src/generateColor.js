@@ -2,13 +2,13 @@
 module.exports = () => {
 
   const saturation = 0.5;
-  const value = 0.9;
+  const value = 0.8;
 
   return hsvToRgb(Math.random(), saturation, value);
 
 };
 
-const  hsvToRgb = (h, s, v) => {
+const hsvToRgb = (h, s, v) => {
 
   let r, g, b;
 
@@ -27,8 +27,10 @@ const  hsvToRgb = (h, s, v) => {
     case 5: r = v, g = p, b = q; break;
   }
 
-  return { red: Math.round(r * 255),
-           blue: Math.round(g * 255),
-           green: Math.round(b * 255) };
+  return {
+    red: Math.round(r * 255),
+    blue: Math.round(g * 255),
+    green: Math.round(b * 255)
+  };
 
 };
