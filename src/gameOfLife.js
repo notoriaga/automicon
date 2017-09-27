@@ -167,8 +167,9 @@ function run(height, width, iterations, seed) {
       return row.concat(row.slice().reverse());
     });
 
-    return board;
-    // return fullBoard;
+    // return board;
+    console.log(fullBoard);
+    return fullBoard;
 
   }
 
