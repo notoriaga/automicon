@@ -51,45 +51,20 @@ const neighbors = [
 
 let THRESHOLD = 7;
 
-const toAliveOrDead = (hash) => {
-
-  return hash.map((hexChar) => {
-
-    return parseInt(`0x${hexChar}`) <= THRESHOLD ? ALIVE : DEAD;
-
-  })
-
-};
-
-const toMatrix = (arr, width) => {
-
-  return arr.reduce((rows, val, index) => {
-
-    return (index % width === 0 ? rows.push([val])
-                                : rows[rows.length - 1].push(val)) && rows;
-
-  }, []);
-
-};
 
 const evolve = (board, rules) => {
 
-  return board.map((row, row_i) => {
-    return row.map((cell, col_i) => {
-      return evolveCell(board, rules, row_i, col_i);
+  return board.map((row, rowIndex) => {
+    return row.map((cell, colIndex) => {
+      return evolveCell(board, rules, cell, rowIndex, colIndex);
     });
   });
 
-}
-
-const evolveCell = (board, rules, row, col) => {
-
-  let neighborCount = getAliveNeighbors(board, row, col);
-  return applyRules(board[row][col], neighborCount, rules);
-
 };
 
-const applyRules = (cell, neighborCount, rules) => {
+const evolveCell = (board, rules, cell, rowIndex, colIndex) => {
+
+  let neighborCount = getAliveNeighbors(board, rowIndex, colIndex);
 
   if (cell === ALIVE && rules[0].indexOf(neighborCount) > -1) {
     // survive
@@ -134,6 +109,27 @@ const hash = (seed, length) => {
 
 };
 
+const toAliveOrDead = (hash) => {
+
+  return hash.map((hexChar) => {
+
+    return parseInt(`0x${hexChar}`) <= THRESHOLD ? ALIVE : DEAD;
+
+  })
+
+};
+
+const toMatrix = (arr, width) => {
+
+  return arr.reduce((rows, val, index) => {
+
+    return (index % width === 0 ? rows.push([val])
+                                : rows[rows.length - 1].push(val)) && rows;
+
+  }, []);
+
+};
+
 const pickRules = (hashArray) => {
 
   let index = parseInt(`0x${hashArray[0]}`) % RULES_ARRAY.length;
@@ -159,7 +155,7 @@ const run = (height, width, iterations, seed) => {
     }, 0);
 
     if (numAlive < 10 || (numCells - numAlive) < 10) {
-      // if there are not enough cells alive try again
+      // if there are not enough, or too many, cells alive try again
       return run(height, width, iterations, seed + seed[0]);
     }
 
