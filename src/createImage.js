@@ -3,81 +3,59 @@ const PNG = require('pngjs').PNG;
 
 const gameOfLife = require('./gameOfLife');
 
-const ITERATIONS = 5;
-
 const FINAL_IMG_SIZE = 256;
-const HALF_IMG_SIZE = FINAL_IMG_SIZE / 2;
 
-const CELL_SIZE = 2 ** 5 ; // length of one side
-const NUM_CELLS = HALF_IMG_SIZE / CELL_SIZE;
+module.exports = (seed, options) => {
 
- module.exports = (seed = 'seed', options) => {
+  let iterations = options.iterations;
+  let cellSize = options.cellSize;
 
-  let width = 4;
-  let height = 8;
-  let iterations = 5;
-  let cellSize = 256 / height;
+  let height = FINAL_IMG_SIZE / cellSize;
+  let width = (FINAL_IMG_SIZE / 2) / cellSize;
 
+  let GOLMatrix = gameOfLife.run(height, width, iterations, seed);
 
-  function randomString(length) {
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-  }
-
-  seed = randomString(5)
-  let game = gameOfLife.run(height, width, iterations, seed);
-
-  let png = pngFromGOLMatric(game, width, cellSize);
-
-  return png;
+  return pngFromGOLMatrix(GOLMatrix, cellSize);
 
 };
 
-const pngFromGOLMatric = (matrix, width, cellSize) => {
+const pngFromGOLMatrix = (matrix, cellSize) => {
 
   let png = new PNG({
-      height: FINAL_IMG_SIZE - 1,
-      width: FINAL_IMG_SIZE - 1
+      height: FINAL_IMG_SIZE,
+      width: FINAL_IMG_SIZE
     });
 
-    let currentColorY = -1;
-    let currentColorX = -1;
+  let currentCellY = 0;
+  let currentCellX = 0;
 
-    for (let y = 0; y < png.height; y++) {
+  for (let y = 0; y < png.height; y++) {
 
-      if (y % cellSize === 0) {
-        currentColorY++;
-      }
+    currentCellX = 0;
 
-      for (let x = 0; x < png.width / 2; x++) {
+    if (y % cellSize === 0 && y !== 0) {
+      currentCellY++;
+    }
 
-          if (x % cellSize === 0) {
-            currentColorX++;
-          }
+    for (let x = 0; x < png.width; x++) {
 
-          if (currentColorX === width) {
-            currentColorX = 0;
-          }
+        if (x % cellSize === 0 && x !== 0) {
+          currentCellX++;
+        }
 
-          let left = (png.width * y + x) << 2;
-          let right = (png.width * y + (png.width - x)) << 2;
+        let writeIndex = (png.width * y + x) << 2;
 
-          png.data[left] = matrix[currentColorY][currentColorX].red;
-          png.data[left+1] = matrix[currentColorY][currentColorX].green;
-          png.data[left+2] = matrix[currentColorY][currentColorX].blue;
-          png.data[left+3] = 255;
-
-
-          png.data[right] = matrix[currentColorY][currentColorX].red;
-          png.data[right+1] = matrix[currentColorY][currentColorX].green;
-          png.data[right+2] = matrix[currentColorY][currentColorX].blue;
-          png.data[right+3] = 255;
-
-      }
+        png.data[writeIndex] = matrix[currentCellY][currentCellX].red;
+        png.data[writeIndex + 1] = matrix[currentCellY][currentCellX].green;
+        png.data[writeIndex + 2] = matrix[currentCellY][currentCellX].blue;
+        png.data[writeIndex + 3] = 255; // alpha
 
     }
 
-    let buffer = PNG.sync.write(png);
+  }
 
-    return buffer;
+  let buffer = PNG.sync.write(png);
+
+  return buffer;
 
 };
