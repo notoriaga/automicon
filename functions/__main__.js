@@ -5,7 +5,7 @@ const PNG = require('pngjs').PNG;
 /**
 * @param {string} seed
 * @param {object} options
-* @returns {any}
+* @returns {buffer}
 */
 module.exports = (seed, options = {
     cellSize: 32,
@@ -16,11 +16,8 @@ module.exports = (seed, options = {
 
   let png = createImage(seed, strongOptions);
 
-  if (context.service.environment === 'local') {
-    fs.writeFileSync(`${seed}.png`, png);
-    return callback(null, `Image saved ${seed}.png`);
-  }
-
+//  console.log('png is buffer?', png instanceof Buffer);
+  fs.writeFileSync('test.png', png)
   return callback(null, png);
 
 };

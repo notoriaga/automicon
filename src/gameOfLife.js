@@ -51,7 +51,6 @@ const neighbors = [
 
 let THRESHOLD = 7;
 
-
 const evolve = (board, rules) => {
 
   return board.map((row, rowIndex) => {
@@ -137,6 +136,7 @@ const pickRules = (hashArray) => {
 
 };
 
+
 const run = (height, width, iterations, seed) => {
 
     let numCells = height * width;
@@ -154,10 +154,15 @@ const run = (height, width, iterations, seed) => {
       return acc + row.filter(cell => cell === ALIVE).length;
     }, 0);
 
-    if (numAlive < 10 || (numCells - numAlive) < 10) {
+    if (numAlive < 5) { // || (numCells - numAlive) < 10
       // if there are not enough, or too many, cells alive try again
       return run(height, width, iterations, seed + seed[0]);
     }
+
+    // let cleanBoard = board.filter((row) => {
+    //   return !row.every(cell => cell === DEAD);
+    // });
+
 
     let fullBoard = board.map((row) => {
       // mirror along vertical axis

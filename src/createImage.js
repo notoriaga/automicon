@@ -4,6 +4,11 @@ const PNG = require('pngjs').PNG;
 const gameOfLife = require('./gameOfLife');
 
 const FINAL_IMG_SIZE = 256;
+const DEAD = {
+  red: 223,
+  green: 223,
+  blue: 223
+};
 
 module.exports = (seed, options) => {
 
@@ -20,6 +25,17 @@ module.exports = (seed, options) => {
 };
 
 const pngFromGOLMatrix = (matrix, cellSize) => {
+
+  let topMargin = matrix.findIndex((row) => {
+    return !row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD))
+  });
+
+  let bottomMargin = matrix.slice()
+                           .reverse()
+                           .findIndex((row) => {
+                             return !row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD))
+                           });
+
 
   let png = new PNG({
       height: FINAL_IMG_SIZE,
