@@ -159,11 +159,6 @@ const run = (height, width, iterations, seed) => {
       return run(height, width, iterations, seed + seed[0]);
     }
 
-    // let cleanBoard = board.filter((row) => {
-    //   return !row.every(cell => cell === DEAD);
-    // });
-
-
     let fullBoard = board.map((row) => {
       // mirror along vertical axis
       return row.concat(row.slice().reverse());

@@ -16,8 +16,10 @@ module.exports = (seed, options = {
 
   let png = createImage(seed, strongOptions);
 
-//  console.log('png is buffer?', png instanceof Buffer);
-  fs.writeFileSync('test.png', png)
+  if (context.service.environment === 'local') {
+    fs.writeFileSync('test.png', png)
+  }
+
   return callback(null, png);
 
 };

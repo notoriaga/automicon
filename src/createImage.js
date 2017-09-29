@@ -26,15 +26,25 @@ module.exports = (seed, options) => {
 
 const pngFromGOLMatrix = (matrix, cellSize) => {
 
+  const emptyRow = (row) => {
+    return row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD));
+  }
+
   let topMargin = matrix.findIndex((row) => {
-    return !row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD))
+    return !emptyRow(row)
   });
 
   let bottomMargin = matrix.slice()
                            .reverse()
                            .findIndex((row) => {
-                             return !row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD))
+                             return !emptyRow(row)
                            });
+
+  let offset = Math.trunc((topMargin + bottomMargin) / 2 * cellSize);
+
+  matrix = matrix.filter((row) => {
+    return !emptyRow(row);
+  });
 
 
   let png = new PNG({
@@ -42,14 +52,30 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
       width: FINAL_IMG_SIZE
     });
 
-  let currentCellY = 0;
-  let currentCellX = 0;
 
   for (let y = 0; y < png.height; y++) {
 
+    for (let x = 0; x < png.width; x++) {
+
+        let writeIndex = (png.width * y + x) << 2;
+
+        png.data[writeIndex] = DEAD.red;
+        png.data[writeIndex + 1] = DEAD.green;
+        png.data[writeIndex + 2] = DEAD.blue;
+        png.data[writeIndex + 3] = 255; // alpha
+
+    }
+
+  }
+
+  let currentCellY = 0;
+  let currentCellX = 0;
+
+  for (let y = offset; y < png.height - offset; y++) {
+
     currentCellX = 0;
 
-    if (y % cellSize === 0 && y !== 0) {
+    if ((y - offset) % cellSize === 0 && (y - offset) !== 0) {
       currentCellY++;
     }
 
