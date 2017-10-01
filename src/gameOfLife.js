@@ -1,41 +1,15 @@
 const crypto = require('crypto');
 
-const ALIVE = require('./generateColor')();
+let ALIVE;
 const DEAD = {
   red: 223,
   green: 223,
   blue: 223
 };
 
-const RULES_ARRAY = [
-  [  // conway
-    [2, 3], // survive
-    [3]     // born
-  ],
-  [  // maze
-    [1, 2, 3, 4, 5],
-    [3]
-  ],
-  [ // walls
-    [2, 3, 4],
-    [4, 5, 6, 7, 8]
-  ],
-  [ // walledCity
-    [2, 3, 4, 5],
-    [4, 5, 6, 7, 8]
-  ],
-  [ // lifeWithoutDeath
-    [0, 1, 2, 3, 4, 5, 6, 7, 8],
-    [3]
-  ],
-  [ // dayAndNight
-    [3, 4, 6, 7, 8],
-    [3, 6, 7, 8]
-  ],
-  [ // diamoeba
-    [5, 6, 7, 8],
-    [3, 5, 6, 7, 8]
-  ]
+const RULES = [
+    [3],
+    [0, 1, 2, 3, 4, 5, 6, 7, 8]
 ];
 
 const neighbors = [
@@ -65,13 +39,13 @@ const evolveCell = (board, rules, cell, rowIndex, colIndex) => {
 
   let neighborCount = getAliveNeighbors(board, rowIndex, colIndex);
 
-  if (cell === ALIVE && rules[0].indexOf(neighborCount) > -1) {
-    // survive
+  if (cell === DEAD && rules[0].indexOf(neighborCount) > -1) {
+    // born
     return ALIVE;
   }
 
-  if (cell === DEAD && rules[1].indexOf(neighborCount) > -1) {
-    // born
+  if (cell === ALIVE && rules[1].indexOf(neighborCount) > -1) {
+    // survive
     return ALIVE;
   }
 
@@ -129,24 +103,17 @@ const toMatrix = (arr, width) => {
 
 };
 
-const pickRules = (hashArray) => {
+const run = (height, width, iterations, seed, attempt = 0) => {
 
-  let index = parseInt(`0x${hashArray[0]}`) % RULES_ARRAY.length;
-  return RULES_ARRAY[index];
-
-};
-
-
-const run = (height, width, iterations, seed) => {
+    ALIVE = require('./generateColor')();
 
     let numCells = height * width;
 
     let hashArray = hash(seed, numCells);
-    let rules = pickRules(hashArray)
     let board = toMatrix(toAliveOrDead(hashArray), width);
-
+    
     while (iterations > 0) {
-      board = evolve(board, rules);
+      board = evolve(board, RULES);
       iterations--;
     }
 
@@ -154,9 +121,10 @@ const run = (height, width, iterations, seed) => {
       return acc + row.filter(cell => cell === ALIVE).length;
     }, 0);
 
-    if (numAlive < 5) { // || (numCells - numAlive) < 10
+    if ((numAlive / numCells < 0.1 || numAlive / numCells > 0.9) && attempt < 10) {
       // if there are not enough, or too many, cells alive try again
-      return run(height, width, iterations, seed + seed[0]);
+      attempt++;
+      return run(height, width, iterations, seed + seed[0], attempt);
     }
 
     let fullBoard = board.map((row) => {

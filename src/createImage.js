@@ -42,16 +42,12 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
 
   let offset = Math.trunc((topMargin + bottomMargin) / 2 * cellSize);
 
-  matrix = matrix.filter((row) => {
-    return !emptyRow(row);
-  });
-
+  matrix = matrix.slice(topMargin, matrix.length - bottomMargin + 1)
 
   let png = new PNG({
       height: FINAL_IMG_SIZE,
       width: FINAL_IMG_SIZE
     });
-
 
   for (let y = 0; y < png.height; y++) {
 
@@ -86,7 +82,7 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
         }
 
         let writeIndex = (png.width * y + x) << 2;
-
+//        console.log(currentCellY, currentCellX);
         png.data[writeIndex] = matrix[currentCellY][currentCellX].red;
         png.data[writeIndex + 1] = matrix[currentCellY][currentCellX].green;
         png.data[writeIndex + 2] = matrix[currentCellY][currentCellX].blue;

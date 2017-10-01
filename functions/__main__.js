@@ -20,7 +20,7 @@ module.exports = (seed, options = {
     fs.writeFileSync('test.png', png)
   }
 
-  return callback(null, png);
+  return callback(null, png, {'content-type': 'application/octet-stream'});
 
 };
 

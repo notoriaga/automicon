@@ -1,3 +1,5 @@
 /node_modules
 env.json
 test.png
+*.png
+package-lock.json
