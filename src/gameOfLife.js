@@ -2,14 +2,14 @@ const crypto = require('crypto');
 
 let ALIVE;
 const DEAD = {
-  red: 223,
-  green: 223,
-  blue: 223
+  red: 239,
+  green: 239,
+  blue: 239
 };
 
 const RULES = [
-    [3],
-    [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    [3], // Born
+    [0, 1, 2, 3, 4, 5, 6, 7, 8] // Survive
 ];
 
 const neighbors = [
@@ -23,28 +23,40 @@ const neighbors = [
   [1, 1]
 ];
 
-let THRESHOLD = 7;
+let THRESHOLD = 5;
 
-const evolve = (board, rules) => {
+const runAutonoma = (states, iterationsLeft, rules) => {
 
-  return board.map((row, rowIndex) => {
+  if (iterationsLeft <= 0) {
+    return states;
+  }
+
+  let nextStates = evolve(states, rules);
+
+  return runAutonoma(nextStates, iterationsLeft - 1, rules)
+
+};
+
+const evolve = (states, rules) => {
+
+  return states.map((row, rowIndex) => {
     return row.map((cell, colIndex) => {
-      return evolveCell(board, rules, cell, rowIndex, colIndex);
+      return evolveCell(states, rules, cell, rowIndex, colIndex);
     });
   });
 
 };
 
-const evolveCell = (board, rules, cell, rowIndex, colIndex) => {
+const evolveCell = (states, rules, cell, rowIndex, colIndex) => {
 
-  let neighborCount = getAliveNeighbors(board, rowIndex, colIndex);
+  let numAliveNeighbors = getAliveNeighbors(states, rowIndex, colIndex);
 
-  if (cell === DEAD && rules[0].indexOf(neighborCount) > -1) {
+  if (cell === DEAD && rules[0].indexOf(numAliveNeighbors) > -1) {
     // born
     return ALIVE;
   }
 
-  if (cell === ALIVE && rules[1].indexOf(neighborCount) > -1) {
+  if (cell === ALIVE && rules[1].indexOf(numAliveNeighbors) > -1) {
     // survive
     return ALIVE;
   }
@@ -53,22 +65,17 @@ const evolveCell = (board, rules, cell, rowIndex, colIndex) => {
 
 };
 
-const getAliveNeighbors = (board, row, col) => {
+const getAliveNeighbors = (states, row, col) => {
 
-  let count = 0;
-
-  neighbors.forEach(neighbor => {
-
+  return neighbors.reduce((count, neighbor) => {
     if (
-      board[row + neighbor[0]] &&
-      board[row + neighbor[0]][col + neighbor[1]] === ALIVE
+      states[row + neighbor[0]] &&
+      states[row + neighbor[0]][col + neighbor[1]] === ALIVE
     ) {
-      count++;
+      return count += 1;
     }
-
-  });
-
-  return count;
+    return count;
+  }, 0);
 
 };
 
@@ -103,36 +110,21 @@ const toMatrix = (arr, width) => {
 
 };
 
-const run = (height, width, iterations, seed, attempt = 0) => {
-
-    ALIVE = require('./generateColor')();
+const run = (height, width, iterations, seed) => {
 
     let numCells = height * width;
 
     let hashArray = hash(seed, numCells);
-    let board = toMatrix(toAliveOrDead(hashArray), width);
-    
-    while (iterations > 0) {
-      board = evolve(board, RULES);
-      iterations--;
-    }
+    ALIVE = require('./generateColor')(parseInt(`0x${hashArray[0]}`) / 16);
 
-    let numAlive = board.reduce((acc, row) => {
-      return acc + row.filter(cell => cell === ALIVE).length;
-    }, 0);
+    let states = toMatrix(toAliveOrDead(hashArray), width);
 
-    if ((numAlive / numCells < 0.1 || numAlive / numCells > 0.9) && attempt < 10) {
-      // if there are not enough, or too many, cells alive try again
-      attempt++;
-      return run(height, width, iterations, seed + seed[0], attempt);
-    }
+    let finalStates = runAutonoma(states, iterations, RULES);
 
-    let fullBoard = board.map((row) => {
+    return finalStates.map((row) => {
       // mirror along vertical axis
       return row.concat(row.slice().reverse());
     });
-
-    return fullBoard;
 
   }
 

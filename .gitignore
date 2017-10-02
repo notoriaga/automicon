@@ -3,3 +3,4 @@ env.json
 test.png
 *.png
 package-lock.json
+test.js

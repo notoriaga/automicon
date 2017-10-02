@@ -5,9 +5,9 @@ const gameOfLife = require('./gameOfLife');
 
 const FINAL_IMG_SIZE = 256;
 const DEAD = {
-  red: 223,
-  green: 223,
-  blue: 223
+  red: 239,
+  green: 239,
+  blue: 239
 };
 
 module.exports = (seed, options) => {
@@ -28,7 +28,7 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
 
   const emptyRow = (row) => {
     return row.every(cell => JSON.stringify(cell) === JSON.stringify(DEAD));
-  }
+  };
 
   let topMargin = matrix.findIndex((row) => {
     return !emptyRow(row)
@@ -40,7 +40,7 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
                              return !emptyRow(row)
                            });
 
-  let offset = Math.trunc((topMargin + bottomMargin) / 2 * cellSize);
+  let offset = Math.trunc((topMargin + bottomMargin) / 2 * cellSize); // centers the cells vertically
 
   matrix = matrix.slice(topMargin, matrix.length - bottomMargin + 1)
 
@@ -49,6 +49,7 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
       width: FINAL_IMG_SIZE
     });
 
+  // draw background
   for (let y = 0; y < png.height; y++) {
 
     for (let x = 0; x < png.width; x++) {
@@ -82,7 +83,7 @@ const pngFromGOLMatrix = (matrix, cellSize) => {
         }
 
         let writeIndex = (png.width * y + x) << 2;
-//        console.log(currentCellY, currentCellX);
+
         png.data[writeIndex] = matrix[currentCellY][currentCellX].red;
         png.data[writeIndex + 1] = matrix[currentCellY][currentCellX].green;
         png.data[writeIndex + 2] = matrix[currentCellY][currentCellX].blue;

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const createImage = require('../src/createImage');
-const PNG = require('pngjs').PNG;
 
 /**
 * @param {string} seed
@@ -9,7 +8,7 @@ const PNG = require('pngjs').PNG;
 */
 module.exports = (seed, options = {
     cellSize: 32,
-    iterations: 5,
+    iterations: 2,
   }, context, callback) => {
 
   let strongOptions = validateOptions(options);
@@ -35,7 +34,7 @@ const validateOptions = (options) => {
     return n >>> 0 === parseFloat(n);
   };
 
-  if (!isPositivePowerOfTwo(options.cellSize) || options.cellSize > 128) {
+  if (!isPositivePowerOfTwo(options.cellSize) || options.cellSize > 128 || options.cellSize < 16) {
     throw new Error(`Invalid parameter for cellsize: ${options.cellSize}`);
   }
 

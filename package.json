@@ -1,5 +1,5 @@
 {
-  "name": "image-generation",
+  "name": "automicon",
   "version": "0.0.0",
   "description": "",
   "author": "steve <steven@stdlib.com>",
@@ -11,7 +11,7 @@
   "private": true,
   "stdlib": {
     "build": "faaslang",
-    "name": "steve/image-generation",
+    "name": "utils/automicon",
     "timeout": 10000,
     "publish": true,
     "personalize": {

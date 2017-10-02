@@ -1,10 +1,10 @@
 
-module.exports = () => {
+module.exports = (hue) => {
 
   const saturation = 0.5;
   const value = 0.8;
 
-  return hsvToRgb(Math.random(), saturation, value);
+  return hsvToRgb(hue, saturation, value);
 
 };
 
