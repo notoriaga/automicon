@@ -3,13 +3,14 @@ const createImage = require('../src/createImage');
 
 /**
 * @param {string} seed
-* @param {object} options
 * @returns {buffer}
 */
-module.exports = (seed, options = {
-    cellSize: 32,
-    iterations: 2,
-  }, context, callback) => {
+module.exports = (seed, context, callback) => {
+
+  let options = {
+      cellSize: 32,
+      iterations: 5,
+  };
 
   let strongOptions = validateOptions(options);
 
@@ -19,7 +20,7 @@ module.exports = (seed, options = {
     fs.writeFileSync('test.png', png)
   }
 
-  return callback(null, png, {'content-type': 'application/octet-stream'});
+  return callback(null, png, {'Content-Type': 'image/png'});
 
 };
 
